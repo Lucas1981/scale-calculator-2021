@@ -1,0 +1,300 @@
+<!doctype html>
+
+<!--
+
+Chord calculator
+================
+
+So, a great improvement given the last version I made of this. In retrospect, that seems like the explorative version, a house of cards
+that worked but something that needed to be radically restructured. I've got everything down in neat little arrays now and that works a whole
+lot better. HTML, CSS and JS have been neatly separated too, which cleans up a lot. And using the CANVAS element in stead of DIVS takes
+care of a whole lot of nightmares as well.
+
+(FIXED: Indeed, the triad chords could be treated as smaller siblings of the seventh chords.)
+(FIXED: A lot of calls are embedded now, that does clean up a bit.)
+Problems are starting to arise again though, where the incorporation of triad chords sort of shook things up. The ghastly affair of
+double code blocks rears its ugly head again because of this. I hope I can keep that beast at bay. In a way, it actually feels like double
+work, because the triad chords really are just the seventh chords without that seventh on top. I don't know if it's absolutely necessary
+to scan twice for each. I'll have to consider that. Meanwhile, the event handlers are also starting to clogg things up at the bottom
+of the code. But that seems to be something that can't really be fixed. It is possible perhaps to loop all the functions up. Nobody is going
+to call a calculation and not call a drawGuitar and printTable afterwards. So I might as well put those at the bottom of the calculation
+call.
+
+(UPDATE: IE now works too since I switched to mp3. Strangely though, I was told Chrome and FF couldn't handle mp3. They seem to be able to though.)
+Other than structure, the addition of the triads and look and feel, the great improvement since the last version is of course sound. You can
+finally hear what it is you're looking at. That is actually great. The sounds run smooth with the framework that the browsers provide (so
+far so good in Chrome and Firefox). Using simple sinewave files generated at tone height with a fade-out garnered better results than I had
+ever hoped. You can actually hear the harmonies quite clearly, which is awesome.
+
+There are some old friends I didn't rescue (25-08-2014) though. First up: the piano. I'm not sure if I can fit it in anymore, but I will see 
+if I can retrieve it. It shouldn't be too hard now making use of the canvas elements. I'll just add another canvas element and draw the thing
+in there. Again, it saves me from a lot of DIV horrors, so it should be relatively easy. Then there's the scale name, with the names of the
+notes in there. Perhaps I should bring that one back. If not explicitly displayed, then at least it's nice to know what is the root note for 
+all the chords. So it should say "E minor" in stead of just "Minor" at least. I think I won't bother with altering all the roman numeral 
+stuff, it's a little obsolete. The big missing thing is perhapd the enharmonic harmonies that I liked in the first version. I still would
+like to add them, I just don't really know where I could park them anymore.
+
+(FIXED: Inversions added)
+I had some other ideas to expand the project. There is still the matter of inversions. I think it's simple to pull off, I just don't know
+where I can find the space to give any more options. Keeping it all compact yet adding functionality are not an easy pair. I thought about
+having a white loop walk along when someone plays the scale. I was also thinking of adding a toggle option to see numbers that correspond 
+with the steps of a scale in stead of the anonymous dots I have now. Working with canvas, that's easy. It might get a little crowded though
+if I would add that. Then there are matters such as sus chords and extensions. I'm not sure what to do with all those things that lay a
+little outside of the core of harmonic calculations. It would be nice to have this project encompass all the stuff, but the question is how
+to fit it all in.
+
+(FIXED: Had to do a 12 minus root-note to get to the proper sound index.)
+For now, if I can add the piano back in and work the option for inversions in I'm done for a first launch.
+Also a small glitch: The notes start inversely from high to low. The F would be very high, while that should only be one half note up
+from E (the lowest note). The D# is low, however, while that should be the highest note. It doesn't resolve the way I'd like yet. I neet to
+listen to what is going on there, armed with an actual guitar to check the output.
+
+-->
+
+<html>
+<head>
+<meta charset="utf-8">
+<title>Scale calculator</title>
+</head>
+
+<body>
+</body><!doctype html>
+
+<html>
+<head>
+<meta charset="utf-8">
+<title>A JavaScript Portfolio</title>
+
+<link href='http://fonts.googleapis.com/css?family=Droid+Serif' rel='stylesheet' type='text/css'>
+<link href="css/stylesheet.css" rel="stylesheet" media="all" />
+
+<!-- Fetch jQuery and the Migrate plugin -->
+<script src="http://code.jquery.com/jquery-1.9.0.js"></script>
+
+</head>
+
+<body>
+
+    <div id="header">
+        <div class="container">
+            <h1>Scale calculator</h1>
+        </div>
+	</div>
+        
+   	<div id="content">
+        <div class="container">            
+           <div class="optionsGroup">
+           
+               <div class="option">
+                    <h3>Select note</h3>
+                    <select id="note">
+                        <option value="0" name="Fb">Fb</option>
+                        <option value="5" name="Cb">Cb</option>
+                        <option value="10" name="Gb">Gb</option>
+                        <option value="3" name="Db">Db</option>
+                        <option value="8" name="Ab">Ab</option>
+                        <option value="1" name="Eb">Eb</option>
+                        <option value="6" name="Bb">Bb</option>
+                        <option value="11" name="F">F</option>
+                        <option value="4" name="C" selected="selected">C</option>
+                        <option value="9" name="G">G</option>
+                        <option value="2" name="D">D</option>
+                        <option value="7" name="A">A</option>
+                        <option value="12" name="E">E</option> <!-- We choose E as the center point -->
+                        <option value="5" name="B">B</option>
+                        <option value="10" name="F#">F#</option>
+                        <option value="3" name="C#">C#</option>
+                        <option value="8" name="G#">G#</option>
+                        <option value="1" name="D#">D#</option>
+                        <option value="6" name="A#">A#</option>
+                        <option value="11" name="E#">E#</option>
+                        <option value="4" name="B#">B#</option>
+                    </select>    
+                </div>
+    
+                <div class="option">
+                    <h3>Select key</h3>
+                    <select id="key">
+                        <option value="0" selected="selected">Major</option>
+                        <option value="1">Natural minor</option>
+                        <option value="2">Harmonic minor</option>
+                        <option value="3">Melodic minor</option>
+                        <option value="4">Hungarian gypsy</option>
+                        <option value="5">Gypsy</option>
+                        <option value="6">Neapolitan minor</option>
+                        <option value="7">Neapolitan major</option>
+                        <option value="8">Flamenco / Double harmonic</option>
+                        <option value="9">Phrygian dominant</option>
+                        <option value="10">Ukranian dorian</option>
+                    </select>
+                </div>
+                
+                <div class="option">
+                    <h3>Select mode</h3>
+                    <select id="mode">
+                        <option value="0" selected="selected">Ionian</option>
+                        <option value="1">Dorian</option>
+                        <option value="2">Phrygian</option>
+                        <option value="3">Lydian</option>
+                        <option value="4">Mixolydian</option>
+                        <option value="5">Aeolian</option>
+                        <option value="6">Locrian</option>
+                    </select>
+                </div>
+                
+                <div class="option" id="scaleDisplay">	
+                    <h3>Scale</h3>
+                    <div id="scale"></div>
+                </div>            
+
+              	<div class="option">
+                    <h3>Play scale</h3>
+                    <button id="playScale">Play</button>
+                </div>
+    
+			</div>
+                        
+            <div class="optionsGroup">
+                <div class="option" id="restrictWidth">
+                    <input type="radio" name="displayToggle" value="0" checked />Fretboard<br>
+                    <input type="radio" name="displayToggle" value="1" />Piano
+                	
+                    <h3>Note options</h3>
+                    <select id="displayDots">
+                    	<option value="0" selected="selected">Dots only</option>
+                        <option value="1">Dots and notes</option>
+                        <option value="2">Dots and roman</option>
+                   	</select>
+                    
+                    <h3>Chord options</h3>
+                    <select id="displayRings">
+                    	<option value="0" selected="selected">Rings only</option>
+                        <option value="1">Rings & relations</option>
+                   	</select>                
+  
+                </div>
+    
+	        	<canvas id="canvas">Not supported</canvas>
+          	</div>
+ 
+            <div class="optionsGroup" id="tableControls">
+                <div class="option">
+                    <h3>Chord playback</h3>
+                    <select id="chordStyle">
+                        <option value="0">Full chords</option>
+                        <option value="1" selected="selected">Fast arpeggio</option>
+                        <option value="2">Slow arpeggio</option>
+                    </select>
+    
+                    <h3>Options</h3>
+                    <input type="checkbox" name="thirdChordsActive" checked /> Third chords<br />
+                    <input type="checkbox" name="susChordsActive" /> Sus4 chord<br />
+                    <input type="checkbox" name="seventhChordsActive" checked /> Seventh chords<br />
+                    <input type="checkbox" name="alternateChordsActive" />Alternate chords<br />
+                </div>
+               
+                <div id="chordTable">
+                                
+                    <table>
+                        <tbody>
+                            <tr>
+                                <th></th>
+                                <th id="triadHeader">
+                                    <div id="triadInversions">
+                                        <input type="radio" name="triadInversions" value="0" checked />5-3
+                                        <input type="radio" name="triadInversions" value="1" />6-3
+                                        <input type="radio" name="triadInversions" value="2" />6-4
+                                    </div>
+                                </th>
+                                <th id="susHeader">
+                                    <div id="susInversions">
+                                        <input type="radio" name="susInversions" value="0" checked />5-4
+                                        <input type="radio" name="susInversions" value="1" />5-2
+                                        <input type="radio" name="susInversions" value="2" />7-4
+                                    </div>
+                                </th>
+                                <th id="seventhHeader">
+                                    <div id="seventhInversions">
+                                        <input type="radio" name="seventhInversions" value="0" checked />7-5-3
+                                        <input type="radio" name="seventhInversions" value="1" />6-5-3
+                                        <input type="radio" name="seventhInversions" value="2" />6-4-3
+                                        <input type="radio" name="seventhInversions" value="3" />6-4-2
+                                    </div>
+                                </th>
+                                <th id="altHeader">
+                                    <div id="altInversions">
+                                        <input type="radio" name="altInversions" value="0" checked />7-5-3
+                                        <input type="radio" name="altInversions" value="1" />6-5-3
+                                        <input type="radio" name="altInversions" value="2" />6-4-3
+                                        <input type="radio" name="altInversions" value="3" />6-4-2
+                                    </div>
+                                </th>
+                            </tr>
+                            <tr>
+                                <td class="roman"></td>
+                                <td class="triadChord"></td>
+                                <td class="susChord"></td>
+                                <td class="diatonicChord"></td>
+                                <td class="enharmonicChord"></td>
+                            </tr>
+                            <tr>
+                                <td class="roman"></td>
+                                <td class="triadChord"></td>
+                                <td class="susChord"></td>
+                                <td class="diatonicChord"></td>
+                                <td class="enharmonicChord"></td>
+                            </tr>
+                            <tr>
+                                <td class="roman"></td>
+                                <td class="triadChord"></td>
+                                <td class="susChord"></td>
+                                <td class="diatonicChord"></td>
+                                <td class="enharmonicChord"></td>
+                            </tr>
+                            <tr>
+                                <td class="roman"></td>
+                                <td class="triadChord"></td>
+                                <td class="susChord"></td>
+                                <td class="diatonicChord"></td>
+                                <td class="enharmonicChord"></td>
+                            </tr>
+                            <tr>
+                                <td class="roman"></td>
+                                <td class="triadChord"></td>
+                                <td class="susChord"></td>
+                                <td class="diatonicChord"></td>
+                                <td class="enharmonicChord"></td>
+                            </tr>
+                            <tr>
+                                <td class="roman"></td>
+                                <td class="triadChord"></td>
+                                <td class="susChord"></td>
+                                <td class="diatonicChord"></td>
+                                <td class="enharmonicChord"></td>
+                            </tr>
+                            <tr>
+                                <td class="roman"></td>
+                                <td class="triadChord"></td>
+                                <td class="susChord"></td>
+                                <td class="diatonicChord"></td>
+                                <td class="enharmonicChord"></td>
+                            </tr>
+                        </tbody>
+                    </table>            
+                </div>
+        	</div>           	
+		</div>
+	</div>
+        
+    <div id="voet">
+        <div class="container">
+        	<p>&copy; Lucas van Heerikhuizen, 2014</p>
+        </div>
+	</div>
+    
+	<script src="js/initiation-fifths.js"></script>
+	<script src="js/functionality.js"></script>
+    
+</body>
+</html>
+</html>
