@@ -2,14 +2,7 @@ import { chords } from './consts.js';
 
 /* Constants */
 
-const canvas = document.getElementById("canvas");
-const context = canvas.getContext("2d");
-const key = document.getElementById("key");
-const note = document.getElementById("note");
-const mode = document.getElementById("mode");
 const chordStyle = document.getElementById("chordStyle");
-const dots = document.getElementById("displayDots");
-const rings = document.getElementById("displayRings");
 
 /* Variables */
 
@@ -75,7 +68,7 @@ class ChordSettingsType {
 
 /* Functions */
 
-function initiateImages() {
+const initiateImages = () => {
 	const promises = [];
 
 	state.guitar.fretImageNames = ["open-fret.png", "fret.png", "fret-met-stip-onder.png", "fret-met-stip-boven.png"];
@@ -113,13 +106,13 @@ function initiateImages() {
 	return promises;
 }
 
-function initiateChordSettings() {
+const initiateChordSettings = () => {
 	state.chordSettings = new ChordSettingsType();
 	state.chordSettings.volume = .25;
 	state.chordSettings.speed = 150;
 }
 
-function initiateGuitar() {
+const initiateGuitar = () => {
 	state.guitar = new GuitarType();
 
 	state.guitar.fretsPerLine = 25; // 24 + the open position
@@ -136,7 +129,7 @@ function initiateGuitar() {
 	// guitar.tuning = [8, 0, 5, 10, 3, 8];	// C G D A E C = [8, 0, 5, 10, 3, 8]
 }
 
-function initiateVariables() {
+const initiateVariables = () => {
 	const ua = window.navigator.userAgent;
   const msie = ua.indexOf("MSIE "); // Detect IE
 
@@ -151,23 +144,14 @@ function initiateVariables() {
 	state.showSusFlag = false;
 	state.diatonicFlag = false;
 	state.alternateFlag = false;
-
-	canvas.width = 800;
-	canvas.height = 192;
 }
 
 export {
-	key,
-	note,
-	mode,
-	dots,
-	rings,
 	pianoImage,
 	initiateVariables,
 	initiateChordSettings,
 	initiateGuitar,
 	initiateImages,
-	context,
 	activeKey,
 	activeSusChords,
 	altChords,

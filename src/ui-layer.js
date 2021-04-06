@@ -1,9 +1,43 @@
 import { SEVENTH, pianoJumps, pianoKeys, roman, chords, chordNames, triadChords, triadChordNames } from './consts.js';
-import { dots, rings, pianoImage, context, activeSusChords, activeKey, altChords, diatonicScale, state } from './initiation.js';
-import { calculateAlternateScale, calculateSusScale } from './scale.js';
+import { pianoImage, activeSusChords, activeKey, altChords, diatonicScale, state } from './initiation.js';
+import { changeScale, calculateAlternateScale, calculateSusScale } from './scale.js';
 import { scheduleSound } from './sound.js';
 
-function printTable() {
+const dots = document.getElementById("displayDots");
+const rings = document.getElementById("displayRings");
+const key = document.getElementById("key");
+const note = document.getElementById("note");
+const mode = document.getElementById("mode");
+const canvas = document.getElementById("canvas");
+const context = canvas.getContext("2d");
+canvas.width = 800;
+canvas.height = 192;
+
+const setEventHandlers = () => {
+	key.onchange = changeScale;
+	note.onchange = changeScale;
+	mode.onchange = changeScale;
+	dots.onchange = () => {
+		state.dotsSetting = 0;
+		drawInstrument();
+	};
+}
+
+const renderLoadingScreen = () => {
+  return setInterval(() => {
+    context.save();
+    context.fillStyle = "#cccccc";
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    context.fillStyle = "black";
+    context.textAlign = "center";
+    context.textBaseline = "middle";
+    context.font = "26px helvetica";
+    context.fillText("Loading images and sounds...", 960/2, canvas.height/2);
+    context.restore();
+  }, 16);
+};
+
+const printTable = () => {
 	let totalKey = "";
 	let totalChords;
 	let i, j;
@@ -76,7 +110,7 @@ function printTable() {
 	$(".altChord").unbind("mouseenter mouseleave click");
 
 	// In with the new
-	$(".altChord").mouseenter(function(){
+	$(".altChord").mouseenter(() => {
 		const str = $(this).attr("id");
 
 		state.diatonicFlag = false; // Make the flag mutually exclusive
@@ -89,12 +123,12 @@ function printTable() {
 		}
 	});
 
-	$(".altChord").mouseleave(function() {
+	$(".altChord").mouseleave(() => {
 		state.alternateFlag = false;
 		drawGuitar();
 	});
 
-	$(".altChord").click(function() { // Since the altChord index is established somewhere else, this one can stay static
+	$(".altChord").click(() => { // Since the altChord index is established somewhere else, this one can stay static
 		if (state.alternateFlag === true) { // Only do this when the alternateFlag is up
 			let i;
 			let index = 0;
@@ -114,18 +148,18 @@ function printTable() {
 	$(".susChord").unbind("mouseenter mouseleave click");
 
 	// In with the new
-	$(".activeSusChord").mouseenter(function() {
+	$(".activeSusChord").mouseenter(() => {
 		state.inversion = parseInt($('input[name="susInversions"]:checked').val());
 		state.diatonic = $(".susChord").index(this);
 		calculateSusScale();
 	});
 
-	$(".activeSusChord").mouseleave(function() {
+	$(".activeSusChord").mouseleave(() => {
 		state.susFlag = false;
 		drawGuitar();
 	});
 
-	$(".activeSusChord").click(function() {
+	$(".activeSusChord").click(() => {
 		let i = 0;
 		let index = 0;
 
@@ -138,124 +172,64 @@ function printTable() {
 		}
 	});
 
-	drawGuitar();
+	drawInstrument();
 }
 
-function drawGuitar() {
-	let i, j, index;
-	let width, height;
+const drawGuitar = (dotsSetting, ringsSetting) => {
+	context.clearRect(0, 0, canvas.width, canvas.height);
 
-	const dotsSetting = parseInt(dots.value);
-	const ringsSetting = parseInt(rings.value)
-
-	// You need the display toggle for this
-	state.displayToggle = parseInt($('input[name="displayToggle"]:checked').val());
-
-	if (state.displayToggle === 0) {// Guitar display
-		// Clear the canvas
-		context.clearRect(0, 0, canvas.width, canvas.height);
-
-		// First, draw the fretboard
-		for (i = 0; i < state.guitar.fretsPerLine; i++) {
-			for(j = 0; j < state.guitar.strings; j++) {
-				index = state.guitar.fretBoard[i + (j * state.guitar.fretsPerLine)];
-				width = state.guitar.fretImages[index].width;
-				height = state.guitar.fretImages[index].height;
-				context.drawImage(state.guitar.fretImages[index], i * width, j * height);
-			}
-		}
-
-		// Next, draw the scale
-		for(j = 0; j < state.guitar.strings; j++) {
-			for(i = 0; i < state.guitar.fretsPerLine; i++) {
-				index = state.guitar.scale[state.guitar.tuning[j] + i + state.guitar.note];
-				if(index !== 0) {
-					index--;
-					width = state.guitar.scaleImages[index].width;
-					height = state.guitar.scaleImages[index].height;
-					context.drawImage(state.guitar.scaleImages[index], i * width, j * height);
-
-					context.save();
-					context.fillStyle = "white";
-					context.textAlign = "center";
-					context.textBaseline = "middle";
-					context.font = "10px helvetica";
-					if (dotsSetting === 1)
-						context.fillText(state.guitar.noteNames[i + state.guitar.tuning[j] + state.guitar.note], 16 + (i * width), 16 + (j * height));
-					if (dotsSetting === 2)
-						context.fillText(state.guitar.romanNames[i + state.guitar.tuning[j] + state.guitar.note], 16 + (i * width), 16 + (j * height));
-					context.restore();
-				}
-			}
-		}
-
-		// If the diatonic flag is up, display the proper diatonic chord
-		if (state.diatonicFlag === true || state.alternateFlag === true || state.susFlag === true) {
-			for (j = 0; j < state.guitar.strings; j++) {
-				for (i = 0; i < state.guitar.fretsPerLine; i++) {
-					index = diatonicScale[state.guitar.tuning[j] + i + state.guitar.note + 12];
-					if (index !== 0) {
-						index--;
-						width = state.guitar.chordImages[index].width;
-						height = state.guitar.chordImages[index].height;
-						context.drawImage(state.guitar.chordImages[index], i * width, j * height);
-
-						if (ringsSetting === 1) {
-							context.save();
-							context.fillStyle = "black";
-							context.textAlign = "center";
-							context.textBaseline = "middle";
-							context.font = "10px helvetica";
-							context.fillText(state.guitar.relations[i + state.guitar.tuning[j] + state.guitar.note], 16 + (i * width), 28 + (j * height));
-							context.restore();
-						}
-					}
-				}
-			}
+	// First, draw the fretboard
+	for (let i = 0; i < state.guitar.fretsPerLine; i++) {
+		for (let j = 0; j < state.guitar.strings; j++) {
+			const index = state.guitar.fretBoard[i + (j * state.guitar.fretsPerLine)];
+			const width = state.guitar.fretImages[index].width;
+			const height = state.guitar.fretImages[index].height;
+			context.drawImage(state.guitar.fretImages[index], i * width, j * height);
 		}
 	}
 
-	if(state.displayToggle === 1) {// Piano display
-		// Clear the canvas
-		context.clearRect(0, 0, canvas.width, canvas.height);
-
-		// First, draw the piano overlay
-		context.drawImage(pianoImage, 0, 0);
-
-		// Next, Run the scale
-		for (i = 0; i < 12 * 2; i++) {
-			index = state.guitar.scale[i + state.guitar.note + 8];
+	// Next, draw the scale
+	for (let j = 0; j < state.guitar.strings; j++) {
+		for (let i = 0; i < state.guitar.fretsPerLine; i++) {
+			let index = state.guitar.scale[state.guitar.tuning[j] + i + state.guitar.note];
 			if (index !== 0) {
 				index--;
-				context.drawImage(state.guitar.scaleImages[index], 11 + (pianoJumps[i] * 27), (pianoKeys[i] * 100) + 50);
+				const width = state.guitar.scaleImages[index].width;
+				const height = state.guitar.scaleImages[index].height;
+				context.drawImage(state.guitar.scaleImages[index], i * width, j * height);
 
 				context.save();
 				context.fillStyle = "white";
 				context.textAlign = "center";
 				context.textBaseline = "middle";
-				context.font = "12px helvetica";
+				context.font = "10px helvetica";
 				if (dotsSetting === 1)
-					context.fillText(state.guitar.noteNames[i + state.guitar.note + 8], 27 + (pianoJumps[i] * 27), (pianoKeys[i] * 100) + 66);
+					context.fillText(state.guitar.noteNames[i + state.guitar.tuning[j] + state.guitar.note], 16 + (i * width), 16 + (j * height));
 				if (dotsSetting === 2)
-					context.fillText(state.guitar.romanNames[i + state.guitar.note + 8], 27 + (pianoJumps[i] * 27), (pianoKeys[i] * 100) + 66);
+					context.fillText(state.guitar.romanNames[i + state.guitar.tuning[j] + state.guitar.note], 16 + (i * width), 16 + (j * height));
 				context.restore();
 			}
 		}
+	}
 
-		// If the diatonic flag is up, show the chord
-		if (state.diatonicFlag === true || state.susFlag === true || state.alternateFlag === true) {
-			for (i = 0; i < 12 * 2; i++) {
-				index = diatonicScale[i + state.guitar.note + 8];
+	// If the diatonic flag is up, display the proper diatonic chord
+	if (state.diatonicFlag === true || state.alternateFlag === true || state.susFlag === true) {
+		for (let j = 0; j < state.guitar.strings; j++) {
+			for (let i = 0; i < state.guitar.fretsPerLine; i++) {
+				let index = diatonicScale[state.guitar.tuning[j] + i + state.guitar.note + 12];
 				if (index !== 0) {
 					index--;
-					context.drawImage(state.guitar.chordImages[index], 11+ (pianoJumps[i] * 27), (pianoKeys[i] * 100) + 50);
+					const width = state.guitar.chordImages[index].width;
+					const height = state.guitar.chordImages[index].height;
+					context.drawImage(state.guitar.chordImages[index], i * width, j * height);
+
 					if (ringsSetting === 1) {
 						context.save();
 						context.fillStyle = "black";
 						context.textAlign = "center";
 						context.textBaseline = "middle";
 						context.font = "10px helvetica";
-						context.fillText(state.guitar.relations[i + state.guitar.note + 8], 27 + (pianoJumps[i] * 27), (pianoKeys[i] * 100) + 78);
+						context.fillText(state.guitar.relations[i + state.guitar.tuning[j] + state.guitar.note], 16 + (i * width), 28 + (j * height));
 						context.restore();
 					}
 				}
@@ -264,7 +238,80 @@ function drawGuitar() {
 	}
 }
 
+const drawPiano = (dotsSetting, ringsSetting) => {
+	context.clearRect(0, 0, canvas.width, canvas.height);
+	context.drawImage(pianoImage, 0, 0);
+
+	// Run the scale
+	for (let i = 0; i < 12 * 2; i++) {
+		let index = state.guitar.scale[i + state.guitar.note + 8];
+		if (index !== 0) {
+			index--;
+			context.drawImage(state.guitar.scaleImages[index], 11 + (pianoJumps[i] * 27), (pianoKeys[i] * 100) + 50);
+			context.save();
+			context.fillStyle = "white";
+			context.textAlign = "center";
+			context.textBaseline = "middle";
+			context.font = "12px helvetica";
+			if (dotsSetting === 1)
+				context.fillText(state.guitar.noteNames[i + state.guitar.note + 8], 27 + (pianoJumps[i] * 27), (pianoKeys[i] * 100) + 66);
+			if (dotsSetting === 2)
+				context.fillText(state.guitar.romanNames[i + state.guitar.note + 8], 27 + (pianoJumps[i] * 27), (pianoKeys[i] * 100) + 66);
+			context.restore();
+		}
+	}
+
+	// If the diatonic flag is up, show the chord
+	if (state.diatonicFlag === true || state.susFlag === true || state.alternateFlag === true) {
+		for (let i = 0; i < 12 * 2; i++) {
+			let index = diatonicScale[i + state.guitar.note + 8];
+			if (index !== 0) {
+				index--;
+				context.drawImage(state.guitar.chordImages[index], 11+ (pianoJumps[i] * 27), (pianoKeys[i] * 100) + 50);
+				if (ringsSetting === 1) {
+					context.save();
+					context.fillStyle = "black";
+					context.textAlign = "center";
+					context.textBaseline = "middle";
+					context.font = "10px helvetica";
+					context.fillText(state.guitar.relations[i + state.guitar.note + 8], 27 + (pianoJumps[i] * 27), (pianoKeys[i] * 100) + 78);
+					context.restore();
+				}
+			}
+		}
+	}
+}
+
+const drawInstrument = () => {
+	const dotsSetting = parseInt(dots.value);
+	const ringsSetting = parseInt(rings.value)
+
+	// You need the display toggle for this
+	state.displayToggle = parseInt($('input[name="displayToggle"]:checked').val());
+	switch(state.displayToggle) {
+		case 0:
+			drawGuitar(dotsSetting, ringsSetting);
+			break;
+		case 1:
+			drawPiano(dotsSetting, ringsSetting);
+			break;
+		default:
+			throw new Error('Illegale instrument index');
+	}
+}
+
+const exposeUserInterface = () => {
+	changeScale();
+	$(".option").show();
+	$("#tableControls").show();
+	$("#note").focus();
+	printTable();
+}
+
 export {
+	setEventHandlers,
 	printTable,
-	drawGuitar
+	drawInstrument,
+	renderLoadingScreen,
+	exposeUserInterface
 };

@@ -1,9 +1,9 @@
 import { SEVENTH, triadRelations, seventhRelations, susRelations, keys, scales, roman, chords, susChord } from './consts.js';
 import { activeKey, activeSusChords, altChords, state, diatonicScale } from './initiation.js';
-import { printTable, drawGuitar } from './ui-layer.js';
+import { printTable, drawInstrument } from './ui-layer.js';
 
 // This one, together with calculateDiationicScale is the meat of the program
-function changeScale() {
+const changeScale = () => {
 	let i, j, k, index;
 	let foundChordFlag;
 	let scaleOffset;
@@ -124,7 +124,7 @@ function changeScale() {
 	printTable();
 }
 
-function calculateDiatonicScale(limit) {
+const calculateDiatonicScale = limit => {
 	var i, j, k, index;
 	var offset = 0;
 
@@ -157,10 +157,10 @@ function calculateDiatonicScale(limit) {
 
 	state.diatonicFlag = true; // Only do this when all the calculations have been executed, otherwiste the whole thing might crash.
 
-	drawGuitar();
+	drawInstrument();
 }
 
-function calculateAlternateScale(limit) {
+const calculateAlternateScale = limit => {
 	var i, j, k, index;
 	var offset = 0;
 
@@ -189,10 +189,10 @@ function calculateAlternateScale(limit) {
 
 	state.alternateFlag = true; // Only do this when all the calculations have been executed
 
-	drawGuitar();
+	drawInstrument();
 }
 
-function calculateSusScale() {
+const calculateSusScale = () => {
 	var i, j, k, index;
 	var offset = 0;
 
@@ -221,7 +221,7 @@ function calculateSusScale() {
 
 		state.susFlag = true; // Only do this when all the calculations have been executed, otherwiste the whole thing might crash.
 
-		drawGuitar();
+		drawInstrument();
 	}
 	else // Otherwise, block the display
 		state.susFlag = false;

@@ -1,44 +1,33 @@
 import { TRIAD, SEVENTH, chords } from './consts.js';
-import { changeScale, calculateDiatonicScale } from './scale.js';
-import { printTable, drawGuitar } from './ui-layer.js';
-import { scheduleSound, initiateSounds } from './sound.js';
 import {
-	key,
-	note,
-	mode,
-	dots,
 	initiateVariables,
 	initiateChordSettings,
 	initiateGuitar,
 	initiateImages,
 	diatonicScale,
-	context,
 	state
 } from './initiation.js';
+import { calculateDiatonicScale } from './scale.js';
+import { printTable, drawInstrument, renderLoadingScreen, exposeUserInterface, setEventHandlers } from './ui-layer.js';
+import { scheduleSound, initiateSounds } from './sound.js';
 
 /* Event handlers */
 
-key.onchange = changeScale;
-note.onchange = changeScale;
-mode.onchange = changeScale;
-dots.onchange = function() {
-	state.dotsSetting = 0;
-	drawGuitar();
-}
+setEventHandlers();
 
-$(".triadChord").mouseenter(function() {
+$(".triadChord").mouseenter(() => {
 	state.alternateFlag = false; // Make the flags mutually exclusive
 	state.inversion = parseInt($('input[name="triadInversions"]:checked').val());
 	state.diatonic = $(".triadChord").index(this);
 	calculateDiatonicScale(TRIAD);
 });
 
-$(".triadChord").mouseleave(function() {
+$(".triadChord").mouseleave(() => {
 	state.diatonicFlag = false;
-	drawGuitar();
+	drawInstrument();
 });
 
-$(".triadChord").click(function() {
+$(".triadChord").click(() => {
 	var i = 0;
 	var index = 0;
 
@@ -52,7 +41,7 @@ $(".triadChord").click(function() {
 	}
 });
 
-$(".diatonicChord").mouseenter(function(){
+$(".diatonicChord").mouseenter(() => {
 	state.alternateFlag = false; // Make the flags mutually exclusive
 	state.inversion = parseInt($('input[name="seventhInversions"]:checked').val());
 	state.diatonic = $(".diatonicChord").index(this);
@@ -61,7 +50,7 @@ $(".diatonicChord").mouseenter(function(){
 
 $(".diatonicChord").mouseleave(() => {
 	state.diatonicFlag = false;
-	drawGuitar();
+	drawInstrument();
 });
 
 $(".diatonicChord").click(() => {
@@ -99,45 +88,31 @@ chordStyle.onchange = () => {
 	}
 };
 
-$('input[name="displayToggle"]').change(function(){
+$('input[name="displayToggle"]').change(() => {
 	printTable();
 });
 
-$('input[name="thirdChordsActive"]').change(function(){
+$('input[name="thirdChordsActive"]').change(() => {
 	state.showThirdsFlag = !state.showThirdsFlag;
 	printTable();
 });
 
-$('input[name="seventhChordsActive"]').change(function(){
+$('input[name="seventhChordsActive"]').change(() => {
 	state.showSeventhsFlag = !state.showSeventhsFlag;
 	printTable();
 });
 
-$('input[name="alternateChordsActive"]').change(function(){
+$('input[name="alternateChordsActive"]').change(() => {
 	state.showAltFlag = !state.showAltFlag;
 	printTable();
 });
 
-$('input[name="susChordsActive"]').change(function(){
+$('input[name="susChordsActive"]').change(() => {
 	state.showSusFlag = !state.showSusFlag;
 	printTable();
 });
 
-const renderLoadingScreen = () => {
-  return setInterval(() => {
-    context.save();
-    context.fillStyle = "#cccccc";
-    context.fillRect(0, 0, canvas.width, canvas.height);
-    context.fillStyle = "black";
-    context.textAlign = "center";
-    context.textBaseline = "middle";
-    context.font = "26px helvetica";
-    context.fillText("Loading images and sounds...", 960/2, canvas.height/2);
-    context.restore();
-  }, 16);
-};
-
-$(document).ready(function() {
+$(document).ready(() => {
   const promises = [];
 	const marginFix = document.getElementsByClassName("container")[0].getBoundingClientRect();
 
@@ -154,10 +129,6 @@ $(document).ready(function() {
 
   Promise.all(promises).then(() => {
     clearInterval(interval);
-  	changeScale();
-  	$(".option").show();
-  	$("#tableControls").show();
-  	$("#note").focus();
-  	printTable();
+    exposeUserInterface();
   });
 });

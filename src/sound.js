@@ -1,7 +1,8 @@
 let audioQueue;
 const audioChannels = [];
 const mySound = [];
-function initiateSounds() {
+
+const initiateSounds = () => {
 	const promises = [];
 
 	for (let i = 0; i < 48; i++) {
@@ -25,8 +26,8 @@ function initiateSounds() {
 	return promises;
 }
 
-function scheduleSound(index, timeStretch, volume, speed) {
-	setTimeout(function() {
+const scheduleSound = (index, timeStretch, volume, speed) => {
+	setTimeout(() => {
 		/*var track = mySound[index].cloneNode();
 		track.volume = volume;
 		track.play();*/
