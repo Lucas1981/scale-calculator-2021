@@ -11,14 +11,15 @@ class State {
   	this._ringsSetting = null;
   	this._chordSettings = null;
   	this._guitar = null;
+    this._pianoImage = null;
   	// Flags
-  	this._showThirdsFlag = null;
-  	this._showSeventhsFlag = null;
-  	this._showAltFlag = null;
-  	this._showSusFlag = null;
-  	this._diatonicFlag = null;
-  	this._alternateFlag = null;
-  	this._susFlag= null;
+  	this._showThirdsFlag = true;
+  	this._showSeventhsFlag = true;
+  	this._showAltFlag = false;
+  	this._showSusFlag = false;
+  	this._diatonicFlag = false;
+  	this._alternateFlag = false;
+  	this._susFlag = false;
   }
 
   get activeScale() { return this._activeScale; }
@@ -57,6 +58,8 @@ class State {
   set alternateFlag(alternateFlag) { this._alternateFlag = alternateFlag; }
   get susFlag() { return this._susFlag; }
   set susFlag(susFlag) { this._susFlag = susFlag; }
+  get pianoImage() { return this._pianoImage; }
+  set pianoImage(pianoImage) { this._pianoImage = pianoImage; }
 }
 
 const state = new State();

@@ -4,7 +4,6 @@ import state from './state.js';
 /* Arrays */
 
 const activeKey = new Array();
-const pianoImage = new Image();
 const altChords = new Array();
 const activeSusChords = new Array();
 const diatonicScale = new Array();
@@ -72,8 +71,9 @@ const initiateImages = () => {
 	}
 
 	promises.push(new Promise(resolve => {
-		pianoImage.src = "images/piano.png";
-		pianoImage.onload = resolve;
+		state.pianoImage = new Image();
+		state.pianoImage.src = "images/piano.png";
+		state.pianoImage.onload = resolve;
 	}));
 
 	return promises;
@@ -91,36 +91,27 @@ const initiateGuitar = () => {
 	state.guitar.fretsPerLine = 25; // 24 + the open position
 	state.guitar.strings = 6;
 
-	state.guitar.fretBoard = [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2,
-						0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3,
-						0, 1, 1, 2, 1, 2, 1, 2, 1, 2, 1, 1, 1, 1, 1, 2, 1, 2, 1, 2, 1, 2, 1, 1, 1,
-						0, 1, 1, 3, 1, 3, 1, 3, 1, 3, 1, 1, 1, 1, 1, 3, 1, 3, 1, 3, 1, 3, 1, 1, 1,
-						0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2,
-						0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3];
+	state.guitar.fretBoard = [
+		0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2,
+		0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3,
+		0, 1, 1, 2, 1, 2, 1, 2, 1, 2, 1, 1, 1, 1, 1, 2, 1, 2, 1, 2, 1, 2, 1, 1, 1,
+		0, 1, 1, 3, 1, 3, 1, 3, 1, 3, 1, 1, 1, 1, 1, 3, 1, 3, 1, 3, 1, 3, 1, 1, 1,
+		0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2,
+		0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3
+	];
 
 	state.guitar.tuning = [0, 7, 3, 10, 5, 0]; 	// E A D G B E = [0, 7, 3, 10, 5, 0]
 	// guitar.tuning = [8, 0, 5, 10, 3, 8];	// C G D A E C = [8, 0, 5, 10, 3, 8]
 }
 
 const initiateVariables = () => {
-	const ua = window.navigator.userAgent;
-  const msie = ua.indexOf("MSIE "); // Detect IE
-
 	for (let i = 0; i < chords.length; i++) {
 		altChords[i] = new Array();
 		for (let j = 0; j < chords.length; j++) altChords[i][j] = 0;
 	}
-
-	state.showThirdsFlag = true;
-	state.showSeventhsFlag = true;
-	state.showAltFlag = false;
-	state.showSusFlag = false;
-	state.diatonicFlag = false;
-	state.alternateFlag = false;
 }
 
 export {
-	pianoImage,
 	initiateVariables,
 	initiateChordSettings,
 	initiateGuitar,

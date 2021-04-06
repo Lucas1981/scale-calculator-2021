@@ -33,7 +33,7 @@ const scales = [
 	[1, 2, 2, 2, 2, 2, 1, 1, 2, 2, 2, 2, 2, 1], // neapolitan major
 	[1, 3, 1, 2, 1, 3, 1, 1, 3, 1, 2, 1, 3, 1], // flamenco
 	[1, 3, 1, 2, 1, 2, 2, 1, 3, 1, 2, 1, 2, 2], // phrygian dominant
-	[2, 1, 3, 1, 2, 1, 2, 2, 1, 3, 1, 2, 1, 2] // ukranian dorian
+	[2, 1, 3, 1, 2, 1, 2, 2, 1, 3, 1, 2, 1, 2]  // ukranian dorian
 ];
 
 const chords = [

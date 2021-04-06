@@ -1,5 +1,5 @@
 import { SEVENTH, pianoJumps, pianoKeys, roman, chords, chordNames, triadChords, triadChordNames } from './consts.js';
-import { pianoImage, activeSusChords, activeKey, altChords, diatonicScale } from './initiation.js';
+import { activeSusChords, activeKey, altChords, diatonicScale } from './initiation.js';
 import { changeScale, calculateAlternateScale, calculateSusScale } from './scale.js';
 import initiateStaticEventHandlers from './event-handlers';
 import state from './state.js';
@@ -258,7 +258,7 @@ const drawGuitar = (dotsSetting, ringsSetting) => {
 
 const drawPiano = (dotsSetting, ringsSetting) => {
 	context.clearRect(0, 0, canvas.width, canvas.height);
-	context.drawImage(pianoImage, 0, 0);
+	context.drawImage(state.pianoImage, 0, 0);
 
 	// Run the scale
 	for (let i = 0; i < 12 * 2; i++) {
