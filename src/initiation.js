@@ -1,32 +1,5 @@
 import { chords } from './consts.js';
-
-/* Constants */
-
-const chordStyle = document.getElementById("chordStyle");
-
-/* Variables */
-
-const state = {
-	activeScale: null,
-	activeMode: null,
-	inversion: null,
-	displayToggle: null,
-	diatonic: null,
-	alternateIndex: null,
-	alternate: null,
-	dotsSetting: null,
-	ringsSetting: null,
-	chordSettings: null,
-	guitar: null,
-	// Flags
-	showThirdsFlag: null,
-	showSeventhsFlag: null,
-	showAltFlag: null,
-	showSusFlag: null,
-	diatonicFlag: null,
-	alternateFlag: null,
-	susFlag: null,
-};
+import state from './state.js';
 
 /* Arrays */
 
@@ -156,5 +129,4 @@ export {
 	activeSusChords,
 	altChords,
 	diatonicScale,
-	state
 };

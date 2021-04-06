@@ -1,5 +1,6 @@
 import { SEVENTH, triadRelations, seventhRelations, susRelations, keys, scales, roman, chords, susChord } from './consts.js';
-import { activeKey, activeSusChords, altChords, state, diatonicScale } from './initiation.js';
+import { activeKey, activeSusChords, altChords, diatonicScale } from './initiation.js';
+import state from './state.js';
 import { printTable, drawInstrument } from './ui-layer.js';
 
 // This one, together with calculateDiationicScale is the meat of the program
@@ -129,24 +130,22 @@ const calculateDiatonicScale = limit => {
 	var offset = 0;
 
 	// First, reset the scale
-	for(i = 0; i < state.guitar.fretsPerLine * state.guitar.strings; i++) diatonicScale[i] = 0;
+	for (i = 0; i < state.guitar.fretsPerLine * state.guitar.strings; i++) diatonicScale[i] = 0;
 
 	// Next, find the offset
-	for(i = 0; i < state.diatonic; i++) offset += scales[state.activeScale][i + state.activeMode]; // Get the church mode in
+	for (i = 0; i < state.diatonic; i++) offset += scales[state.activeScale][i + state.activeMode]; // Get the church mode in
 
 	// Then, load in the proper chord, converting the interval values to (almost) boolean scale values
 	i = 0;
 	index = 0;
-	do
-	{
-		for(j = 0; j < 8; j++)
-		{
-			if(limit === SEVENTH)
+	do {
+		for (j = 0; j < 8; j++) {
+			if (limit === SEVENTH)
 				state.guitar.relations[index + offset + (j * 12)] = seventhRelations[state.inversion][i-1];
 			else
 				state.guitar.relations[index + offset + (j * 12)] = triadRelations[state.inversion][i-1];
 
-			if(index - chords[state.guitar.chords[state.diatonic]][state.inversion] === 0)
+			if (index - chords[state.guitar.chords[state.diatonic]][state.inversion] === 0)
 				diatonicScale[index + offset + (j * 12)] = 2; // force the root-note in there
 			else
 				diatonicScale[index + offset + (j * 12)] = 1;
@@ -161,22 +160,20 @@ const calculateDiatonicScale = limit => {
 }
 
 const calculateAlternateScale = limit => {
-	var i, j, k, index;
-	var offset = 0;
+	let i, j, k, index;
+	let offset = 0;
 
 	// First, reset the scale
-	for(i = 0; i < state.guitar.fretsPerLine * state.guitar.strings; i++) diatonicScale[i] = 0;
+	for (i = 0; i < state.guitar.fretsPerLine * state.guitar.strings; i++) diatonicScale[i] = 0;
 
 	// Next, find the offset
-	for(i = 0; i < state.alternate; i++) offset += scales[state.activeScale][i + state.activeMode]; // Get the church mode in
+	for (i = 0; i < state.alternate; i++) offset += scales[state.activeScale][i + state.activeMode]; // Get the church mode in
 
 	// Then, load in the proper chord, converting the interval values to (almost) boolean scale values
 	i = 0;
 	index = 0;
-	do
-	{
-		for(j = 0; j < 8; j++)
-		{
+	do {
+		for (j = 0; j < 8; j++) {
 			state.guitar.relations[index + offset + (j * 12)] = seventhRelations[state.inversion][i-1];
 			if(index - chords[state.alternateIndex][state.inversion] === 0)
 				diatonicScale[index + offset + (j * 12)] = 4; // force the root-note in there
@@ -193,11 +190,11 @@ const calculateAlternateScale = limit => {
 }
 
 const calculateSusScale = () => {
-	var i, j, k, index;
-	var offset = 0;
+	let i, j, k, index;
+	let offset = 0;
 
-	if(activeSusChords[state.diatonic] === true) // Only do this if the sus chord is actually in there
-	{
+
+	if (activeSusChords[state.diatonic] === 1) { // Only do this if the sus chord is actually in there
 		// First, reset the scale
 		for(i = 0; i < state.guitar.fretsPerLine * state.guitar.strings; i++) diatonicScale[i] = 0;
 
@@ -219,12 +216,13 @@ const calculateSusScale = () => {
 			i++;
 		} while(i <= 3);
 
-		state.susFlag = true; // Only do this when all the calculations have been executed, otherwiste the whole thing might crash.
+		state.susFlag = true; // Only do this when all the calculations have been executed, otherwise the whole thing might crash.
 
 		drawInstrument();
 	}
-	else // Otherwise, block the display
+	else { // Otherwise, block the display
 		state.susFlag = false;
+	}
 }
 
 export {

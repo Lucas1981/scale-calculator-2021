@@ -1,6 +1,8 @@
 import { SEVENTH, pianoJumps, pianoKeys, roman, chords, chordNames, triadChords, triadChordNames } from './consts.js';
-import { pianoImage, activeSusChords, activeKey, altChords, diatonicScale, state } from './initiation.js';
+import { pianoImage, activeSusChords, activeKey, altChords, diatonicScale } from './initiation.js';
 import { changeScale, calculateAlternateScale, calculateSusScale } from './scale.js';
+import initiateStaticEventHandlers from './event-handlers';
+import state from './state.js';
 import { scheduleSound } from './sound.js';
 
 const dots = document.getElementById("displayDots");
@@ -10,10 +12,11 @@ const note = document.getElementById("note");
 const mode = document.getElementById("mode");
 const canvas = document.getElementById("canvas");
 const context = canvas.getContext("2d");
+const chordStyle = document.getElementById("chordStyle");
 canvas.width = 800;
 canvas.height = 192;
 
-const setEventHandlers = () => {
+const initiateEventHandlers = () => {
 	key.onchange = changeScale;
 	note.onchange = changeScale;
 	mode.onchange = changeScale;
@@ -21,7 +24,22 @@ const setEventHandlers = () => {
 		state.dotsSetting = 0;
 		drawInstrument();
 	};
-}
+
+	chordStyle.onchange = () => {
+		if (chordStyle.value === "0") {
+			state.chordSettings.speed = 0;
+			state.chordSettings.volume = .25;
+		} else if (chordStyle.value === "1") {
+			state.chordSettings.speed = 150;
+			state.chordSettings.volume = .25;
+		} else {
+			state.chordSettings.speed = 1000;
+			state.chordSettings.volume = 1;
+		}
+	};
+
+	initiateStaticEventHandlers();
+};
 
 const renderLoadingScreen = () => {
   return setInterval(() => {
@@ -110,12 +128,12 @@ const printTable = () => {
 	$(".altChord").unbind("mouseenter mouseleave click");
 
 	// In with the new
-	$(".altChord").mouseenter(() => {
+	$(".altChord").mouseenter(function() { // We need the 'this', so we write it as a scoped function
 		const str = $(this).attr("id");
 
 		state.diatonicFlag = false; // Make the flag mutually exclusive
 
-		if(state.alternateFlag === false) {
+		if (state.alternateFlag === false) {
 			state.inversion = parseInt($('input[name="altInversions"]:checked').val());
 			state.alternateIndex = parseInt(str.substr(str.indexOf("-") + 1));
 			state.alternate = parseInt($(this).parent(".enharmonicChord").index(".enharmonicChord"));
@@ -125,7 +143,7 @@ const printTable = () => {
 
 	$(".altChord").mouseleave(() => {
 		state.alternateFlag = false;
-		drawGuitar();
+		drawInstrument();
 	});
 
 	$(".altChord").click(() => { // Since the altChord index is established somewhere else, this one can stay static
@@ -148,7 +166,7 @@ const printTable = () => {
 	$(".susChord").unbind("mouseenter mouseleave click");
 
 	// In with the new
-	$(".activeSusChord").mouseenter(() => {
+	$(".activeSusChord").mouseenter(function() { // We need the 'this' object, so we use a scoped function
 		state.inversion = parseInt($('input[name="susInversions"]:checked').val());
 		state.diatonic = $(".susChord").index(this);
 		calculateSusScale();
@@ -156,7 +174,7 @@ const printTable = () => {
 
 	$(".activeSusChord").mouseleave(() => {
 		state.susFlag = false;
-		drawGuitar();
+		drawInstrument();
 	});
 
 	$(".activeSusChord").click(() => {
@@ -173,7 +191,7 @@ const printTable = () => {
 	});
 
 	drawInstrument();
-}
+};
 
 const drawGuitar = (dotsSetting, ringsSetting) => {
 	context.clearRect(0, 0, canvas.width, canvas.height);
@@ -236,7 +254,7 @@ const drawGuitar = (dotsSetting, ringsSetting) => {
 			}
 		}
 	}
-}
+};
 
 const drawPiano = (dotsSetting, ringsSetting) => {
 	context.clearRect(0, 0, canvas.width, canvas.height);
@@ -298,7 +316,7 @@ const drawInstrument = () => {
 		default:
 			throw new Error('Illegale instrument index');
 	}
-}
+};
 
 const exposeUserInterface = () => {
 	changeScale();
@@ -306,10 +324,10 @@ const exposeUserInterface = () => {
 	$("#tableControls").show();
 	$("#note").focus();
 	printTable();
-}
+};
 
 export {
-	setEventHandlers,
+	initiateEventHandlers,
 	printTable,
 	drawInstrument,
 	renderLoadingScreen,
