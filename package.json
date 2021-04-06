@@ -1,0 +1,30 @@
+{
+  "name": "scale-calculator-2021",
+  "version": "1.0.0",
+  "description": "This is a revamp of a 2014 project. All I knew back then was C and jQuery, so please excuse the clumsiness that it might show today. I'll try to refactor out bit by bit all the parts and hopefully turn them into coherent layer-based classes that manage their own state. After that perhaps some turning it into a Vue based version would also make sense, just to get rid of all the jQuery grabbing DOM elements stuff.",
+  "main": "webpack.config.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack",
+    "start": "webpack-dev-server --open --mode development",
+    "watch-dev": "webpack --watch --mode development"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Lucas1981/scale-calculator-2021.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Lucas1981/scale-calculator-2021/issues"
+  },
+  "homepage": "https://github.com/Lucas1981/scale-calculator-2021#readme",
+  "devDependencies": {
+    "@babel/core": "^7.13.14",
+    "@babel/preset-env": "^7.13.12",
+    "babel-loader": "^8.2.2",
+    "webpack": "^5.30.0",
+    "webpack-cli": "^3.3.4",
+    "webpack-dev-server": "^3.7.1"
+  }
+}
