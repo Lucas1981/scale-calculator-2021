@@ -1,5 +1,4 @@
 import { SEVENTH, pianoJumps, pianoKeys, roman, chords, chordNames, triadChords, triadChordNames } from './consts.js';
-import { activeSusChords, activeKey, altChords, diatonicScale } from './initiation.js';
 import { changeScale, calculateAlternateScale, calculateSusScale } from './scale.js';
 import initiateStaticEventHandlers from './event-handlers';
 import state from './state.js';
@@ -16,14 +15,17 @@ const chordStyle = document.getElementById("chordStyle");
 canvas.width = 800;
 canvas.height = 192;
 
+const handleChange = () => {
+	changeScale();
+	draw();
+};
+
 const initiateEventHandlers = () => {
-	key.onchange = changeScale;
-	note.onchange = changeScale;
-	mode.onchange = changeScale;
-	dots.onchange = () => {
-		state.dotsSetting = 0;
-		drawInstrument();
-	};
+	key.onchange = handleChange;
+	note.onchange = handleChange;
+	mode.onchange = handleChange;
+	rings.onchange = drawInstrument;
+	dots.onchange = drawInstrument;
 
 	chordStyle.onchange = () => {
 		if (chordStyle.value === "0") {
@@ -62,28 +64,28 @@ const printTable = () => {
 
 	for (i = 0; i < 7; i++) {
 		$(".roman:eq(" + i + ")").html(roman[i]);
-		$(".triadChord:eq(" + i + ")").html(activeKey[i] + " " + triadChordNames[triadChords[state.guitar.chords[i]]]);
-		$(".diatonicChord:eq(" + i + ")").html(activeKey[i] + " " + chordNames[state.guitar.chords[i]]);
+		$(".triadChord:eq(" + i + ")").html(state.activeKey[i] + " " + triadChordNames[triadChords[state.guitar.chords[i]]]);
+		$(".diatonicChord:eq(" + i + ")").html(state.activeKey[i] + " " + chordNames[state.guitar.chords[i]]);
 		// Remove the sus class if it's there, then conditionally add it again
 		if ($(".susChord:eq(" + i + ")").hasClass("activeSusChord")) {
 			$(".susChord:eq(" + i + ")").removeClass("activeSusChord");
 		}
 		$(".susChord:eq(" + i + ")").html("");
 
-		if(activeSusChords[i] === 1) {
+		if(state.activeSusChords[i] === 1) {
 			$(".susChord:eq(" + i + ")").addClass("activeSusChord");
-			$(".susChord:eq(" + i + ")").html(activeKey[i] + " sus4");
+			$(".susChord:eq(" + i + ")").html(state.activeKey[i] + " sus4");
 		}
 
 		totalChords = "";
 
 		for (j = 0; j < chords.length; j++) {
-			if (altChords[i][j] === 1)
-				totalChords += "<div class=\"altChord\" id=" + i + "-" + j + ">" + activeKey[i] + " " + chordNames[j] + "</div>";
+			if (state.altChords[i][j] === 1)
+				totalChords += "<div class=\"altChord\" id=" + i + "-" + j + ">" + state.activeKey[i] + " " + chordNames[j] + "</div>";
 		}
 		$(".enharmonicChord:eq(" + i + ")").html(totalChords);
 
-		totalKey += activeKey[i] + " ";
+		totalKey += state.activeKey[i] + " ";
 	}
 	$("#scale").empty();
 	$("#scale").html(totalKey);
@@ -138,6 +140,7 @@ const printTable = () => {
 			state.alternateIndex = parseInt(str.substr(str.indexOf("-") + 1));
 			state.alternate = parseInt($(this).parent(".enharmonicChord").index(".enharmonicChord"));
 			calculateAlternateScale(SEVENTH);
+			drawInstrument();
 		}
 	});
 
@@ -151,11 +154,11 @@ const printTable = () => {
 			let i;
 			let index = 0;
 
-			while(diatonicScale[index] !== 4 && index < diatonicScale.length)
+			while(state.diatonicScale[index] !== 4 && index < state.diatonicScale.length)
 				index++;
 
 			for(i = 0; i < chords[state.alternateIndex].length; i++) {
-				while(diatonicScale[index] === 0 && index < diatonicScale.length) index++; // Scan the diatonicScale for each consecutive note
+				while(state.diatonicScale[index] === 0 && index < state.diatonicScale.length) index++; // Scan the state.diatonicScale for each consecutive note
 				scheduleSound(index + (12 - state.guitar.note), i, state.chordSettings.volume, state.chordSettings.speed); // Put it in the sequence
 				index++;
 			}
@@ -170,6 +173,7 @@ const printTable = () => {
 		state.inversion = parseInt($('input[name="susInversions"]:checked').val());
 		state.diatonic = $(".susChord").index(this);
 		calculateSusScale();
+		drawInstrument();
 	});
 
 	$(".activeSusChord").mouseleave(() => {
@@ -181,16 +185,14 @@ const printTable = () => {
 		let i = 0;
 		let index = 0;
 
-		while (diatonicScale[index] !== 2 && index < diatonicScale.length) index++;
+		while (state.diatonicScale[index] !== 2 && index < state.diatonicScale.length) index++;
 
 		for (i = 0; i < 3; i++) {
-			while(diatonicScale[index] === 0 && index < diatonicScale.length) index++; // Scan the diatonicScale for each consecutive note
+			while(state.diatonicScale[index] === 0 && index < state.diatonicScale.length) index++; // Scan the state.diatonicScale for each consecutive note
 			scheduleSound(index + (12 - state.guitar.note), i, state.chordSettings.volume, state.chordSettings.speed); // Put it in the sequence, with the note offset added
 			index++;
 		}
 	});
-
-	drawInstrument();
 };
 
 const drawGuitar = (dotsSetting, ringsSetting) => {
@@ -234,7 +236,7 @@ const drawGuitar = (dotsSetting, ringsSetting) => {
 	if (state.diatonicFlag === true || state.alternateFlag === true || state.susFlag === true) {
 		for (let j = 0; j < state.guitar.strings; j++) {
 			for (let i = 0; i < state.guitar.fretsPerLine; i++) {
-				let index = diatonicScale[state.guitar.tuning[j] + i + state.guitar.note + 12];
+				let index = state.diatonicScale[state.guitar.tuning[j] + i + state.guitar.note + 12];
 				if (index !== 0) {
 					index--;
 					const width = state.guitar.chordImages[index].width;
@@ -282,7 +284,7 @@ const drawPiano = (dotsSetting, ringsSetting) => {
 	// If the diatonic flag is up, show the chord
 	if (state.diatonicFlag === true || state.susFlag === true || state.alternateFlag === true) {
 		for (let i = 0; i < 12 * 2; i++) {
-			let index = diatonicScale[i + state.guitar.note + 8];
+			let index = state.diatonicScale[i + state.guitar.note + 8];
 			if (index !== 0) {
 				index--;
 				context.drawImage(state.guitar.chordImages[index], 11+ (pianoJumps[i] * 27), (pianoKeys[i] * 100) + 50);
@@ -318,16 +320,22 @@ const drawInstrument = () => {
 	}
 };
 
+const draw = () => {
+	printTable();
+	drawInstrument();
+}
+
 const exposeUserInterface = () => {
 	changeScale();
 	$(".option").show();
 	$("#tableControls").show();
 	$("#note").focus();
-	printTable();
+	draw();
 };
 
 export {
 	initiateEventHandlers,
+	draw,
 	printTable,
 	drawInstrument,
 	renderLoadingScreen,

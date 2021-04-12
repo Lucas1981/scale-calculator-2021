@@ -1,7 +1,6 @@
 import { TRIAD, SEVENTH, chords } from './consts.js';
-import { diatonicScale } from './initiation.js';
 import { calculateDiatonicScale } from './scale.js';
-import { printTable, drawInstrument } from './ui-layer.js';
+import { draw, printTable, drawInstrument } from './ui-layer.js';
 import state from './state.js';
 import { scheduleSound } from './sound.js';
 
@@ -11,6 +10,7 @@ const setEventHandlers = () => {
   	state.inversion = parseInt($('input[name="triadInversions"]:checked').val());
   	state.diatonic = $(".triadChord").index(this);
   	calculateDiatonicScale(TRIAD);
+    drawInstrument();
   });
 
   $(".triadChord").mouseleave(() => {
@@ -21,11 +21,11 @@ const setEventHandlers = () => {
   $(".triadChord").click(() => {
   	let index = 0;
 
-  	while (diatonicScale[index] !== 2 && index < diatonicScale.length) index++;
+  	while (state.diatonicScale[index] !== 2 && index < state.diatonicScale.length) index++;
 
   	for (let i = 0; i < 3; i++)
   	{
-  		while (diatonicScale[index] === 0 && index < diatonicScale.length) index++; // Scan the diatonicScale for each consecutive note
+  		while (state.diatonicScale[index] === 0 && index < state.diatonicScale.length) index++; // Scan the state.diatonicScale for each consecutive note
   		scheduleSound(index + (12 - state.guitar.note), i, state.chordSettings.volume, state.chordSettings.speed); // Put it in the sequence, with the note offset added
   		index++;
   	}
@@ -36,6 +36,7 @@ const setEventHandlers = () => {
   	state.inversion = parseInt($('input[name="seventhInversions"]:checked').val());
   	state.diatonic = $(".diatonicChord").index(this);
   	calculateDiatonicScale(SEVENTH);
+    drawInstrument();
   });
 
   $(".diatonicChord").mouseleave(() => {
@@ -46,10 +47,10 @@ const setEventHandlers = () => {
   $(".diatonicChord").click(() => {
   	let index = 0;
 
-  	while (diatonicScale[index] !== 2) index++;
+  	while (state.diatonicScale[index] !== 2) index++;
 
   	for (let i = 0; i < chords[state.guitar.chords[state.diatonic]].length; i++) {
-  		while(diatonicScale[index] === 0) index++; // Scan the diatonicScale for each consecutive note
+  		while(state.diatonicScale[index] === 0) index++; // Scan the state.diatonicScale for each consecutive note
   		scheduleSound(index + (12 - state.guitar.note), i, state.chordSettings.volume, state.chordSettings.speed); // Put it in the sequence, with the note offset added
   		index++;
   	}
@@ -59,14 +60,14 @@ const setEventHandlers = () => {
   	let index = 0;
 
   	for (let i = 0; i < 8; i++) {
-  		while (state.guitar.scale[index] === 0) index++; // Scan the diatonicScale for each consecutive note
+  		while (state.guitar.scale[index] === 0) index++; // Scan the scale for each consecutive note
   		scheduleSound(index + state.guitar.note, i, 1, 1000); // Put it in the sequence, with the note offset added
   		index++;
   	}
   });
 
   $('input[name="displayToggle"]').change(() => {
-  	printTable();
+  	drawInstrument();
   });
 
   $('input[name="thirdChordsActive"]').change(() => {

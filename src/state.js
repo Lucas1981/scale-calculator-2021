@@ -7,8 +7,6 @@ class State {
   	this._diatonic = null;
   	this._alternateIndex = null;
   	this._alternate = null;
-  	this._dotsSetting = null;
-  	this._ringsSetting = null;
   	this._chordSettings = null;
   	this._guitar = null;
     this._pianoImage = null;
@@ -20,6 +18,11 @@ class State {
   	this._diatonicFlag = false;
   	this._alternateFlag = false;
   	this._susFlag = false;
+    // Arrays
+    this._activeKey = [];
+    this._altChords = [];
+    this._activeSusChords = [];
+    this._diatonicScale = [];
   }
 
   get activeScale() { return this._activeScale; }
@@ -36,10 +39,6 @@ class State {
   set alternateIndex(alternateIndex) { this._alternateIndex = alternateIndex; }
   get alternate() { return this._alternate; }
   set alternate(alternate) { this._alternate = alternate; }
-  get dotsSetting() { return this._dotsSetting; }
-  set dotsSetting(dotsSetting) { this._dotsSetting = dotsSetting; }
-  get ringsSetting() { return this._ringsSetting; }
-  set ringsSetting(ringsSetting) { this._ringsSetting = ringsSetting; }
   get chordSettings() { return this._chordSettings; }
   set chordSettings(chordSettings) { this._chordSettings = chordSettings; }
   get guitar() { return this._guitar; }
@@ -60,6 +59,14 @@ class State {
   set susFlag(susFlag) { this._susFlag = susFlag; }
   get pianoImage() { return this._pianoImage; }
   set pianoImage(pianoImage) { this._pianoImage = pianoImage; }
+  get activeKey() { return this._activeKey; }
+  set activeKey(activeKey) { this._activeKey = activeKey; }
+  get altChords() { return this._altChords; }
+  set altChords(altChords) { this._altChords = altChords; }
+  get activeSusChords() { return this._activeSusChords; }
+  set activeSusChords(activeSusChords) { this._activeSusChords = activeSusChords; }
+  get diatonicScale() { return this._diatonicScale; }
+  set diatonicScale(diatonicScale) { this._diatonicScale = diatonicScale; }
 }
 
 const state = new State();

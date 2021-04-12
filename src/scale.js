@@ -1,7 +1,5 @@
 import { SEVENTH, triadRelations, seventhRelations, susRelations, keys, scales, roman, chords, susChord } from './consts.js';
-import { activeKey, activeSusChords, altChords, diatonicScale } from './initiation.js';
 import state from './state.js';
-import { printTable, drawInstrument } from './ui-layer.js';
 
 const getNoteNames = () => {
 	let i = 7;
@@ -10,28 +8,28 @@ const getNoteNames = () => {
 	let flatCorrection = 0;
 	let sharpCorrection = 0;
 
-	activeKey[0] = $("#note option:eq(" + $("#note")[0].selectedIndex + ")").attr("name");
+	state.activeKey[0] = $("#note option:eq(" + $("#note")[0].selectedIndex + ")").attr("name");
 
-	while (keys[0][i] !== activeKey[0].substring(0,1)) i++;
-	if (activeKey[0].length > 1) {
-		if (activeKey[0].substring(1,2) === "#") sharpCorrection = 1;
-		if (activeKey[0].substring(1,2) === "b") flatCorrection = 1;
+	while (keys[0][i] !== state.activeKey[0].substring(0,1)) i++;
+	if (state.activeKey[0].length > 1) {
+		if (state.activeKey[0].substring(1,2) === "#") sharpCorrection = 1;
+		if (state.activeKey[0].substring(1,2) === "b") flatCorrection = 1;
 	}
 
 	for (let j = 0; j < 7; j++) {
-		activeKey[j+1] = keys[0][1+i+j];
+		state.activeKey[j+1] = keys[0][1+i+j];
 		keyIncrease += keys[1][j+i];
 		scaleIncrease += scales[state.activeScale][j];
 
 		if (keyIncrease - sharpCorrection + flatCorrection > scaleIncrease) {
 			for(let k = 0; k < ((keyIncrease - sharpCorrection + flatCorrection) - scaleIncrease); k++) {
-				activeKey[j+1] += "b";
+				state.activeKey[j+1] += "b";
 			}
 		}
 
 		if (keyIncrease - sharpCorrection + flatCorrection < scaleIncrease) {
 			for (let k = 0; k < (scaleIncrease - (keyIncrease - sharpCorrection + flatCorrection)); k++) {
-				activeKey[j+1] += "#";
+				state.activeKey[j+1] += "#";
 			}
 		}
 	}
@@ -48,7 +46,7 @@ const loadProperScale = () => {
 	let index = 0;
 	do {
 		for (let j = 0; j < 4; j++) {
-			state.guitar.noteNames[index + (j * 12)] = activeKey[i];
+			state.guitar.noteNames[index + (j * 12)] = state.activeKey[i];
 			state.guitar.romanNames[index + (j * 12)] = roman[i];
 			if (index > 0) {
 				state.guitar.scale[index + (j * 12)] = 1;
@@ -90,12 +88,12 @@ const findSusChords = () => {
 	for (let i = 0; i < 7; i++) { // Do this for every step
 		let k = 0; // Reset the interval indexing
 		let foundChordFlag = true; // Assume the chord will pass the test
-		activeSusChords[i] = 0; // Assume the chord won't be indexed
+		state.activeSusChords[i] = 0; // Assume the chord won't be indexed
 		while (k < 4 && foundChordFlag === true) {// Test the chord
 			if (state.guitar.scale[index + susChord[k]] === 0) foundChordFlag = false; // If the interval falls through, move on
 			else k++;
 		}
-		if (foundChordFlag === true) activeSusChords[i] = 1; // If the flag is still up, the chord is there
+		if (foundChordFlag === true) state.activeSusChords[i] = 1; // If the flag is still up, the chord is there
 		index += scales[state.activeScale][i];
 	}
 };
@@ -106,13 +104,13 @@ const indexAlternateChords = () => {
 		for (let j = 0; j < 10; j++) { // Do this for every chord type
 			let k = 0; // Reset the interval indexing
 			let foundChordFlag = true; // Assume the chord will pass the test
-			altChords[i][j] = 0; // Assume the chord won't be indexed
+			state.altChords[i][j] = 0; // Assume the chord won't be indexed
 			while(k < 4 && foundChordFlag === true) { // Test the chord
 				if (state.guitar.scale[index + chords[j][k]] === 0) foundChordFlag = false; // If the interval falls through, move on
 				else k++;
 			}
 			if(foundChordFlag === true && state.guitar.chords[i] != j) { // Make sure the initial chord is not included
-				altChords[i][j] = 1; // If the flag is still up, the chord is there
+				state.altChords[i][j] = 1; // If the flag is still up, the chord is there
 			}
 		}
 		index += scales[state.activeScale][i];
@@ -131,7 +129,6 @@ const changeScale = () => {
 	findSeventhChords();
 	findSusChords();
 	indexAlternateChords();
-	printTable();
 };
 
 const calculateDiatonicScale = limit => {
@@ -139,7 +136,7 @@ const calculateDiatonicScale = limit => {
 	var offset = 0;
 
 	// First, reset the scale
-	for (i = 0; i < state.guitar.fretsPerLine * state.guitar.strings; i++) diatonicScale[i] = 0;
+	for (i = 0; i < state.guitar.fretsPerLine * state.guitar.strings; i++) state.diatonicScale[i] = 0;
 
 	// Next, find the offset
 	for (i = 0; i < state.diatonic; i++) offset += scales[state.activeScale][i + state.activeMode]; // Get the church mode in
@@ -155,17 +152,15 @@ const calculateDiatonicScale = limit => {
 				state.guitar.relations[index + offset + (j * 12)] = triadRelations[state.inversion][i-1];
 
 			if (index - chords[state.guitar.chords[state.diatonic]][state.inversion] === 0)
-				diatonicScale[index + offset + (j * 12)] = 2; // force the root-note in there
+				state.diatonicScale[index + offset + (j * 12)] = 2; // force the root-note in there
 			else
-				diatonicScale[index + offset + (j * 12)] = 1;
+				state.diatonicScale[index + offset + (j * 12)] = 1;
 		}
 		index = chords[state.guitar.chords[state.diatonic]][i]; // Get the church mode in there
 		i++;
 	} while(i <= 4 - limit);
 
 	state.diatonicFlag = true; // Only do this when all the calculations have been executed, otherwiste the whole thing might crash.
-
-	drawInstrument();
 };
 
 const calculateAlternateScale = limit => {
@@ -173,7 +168,7 @@ const calculateAlternateScale = limit => {
 	let offset = 0;
 
 	// First, reset the scale
-	for (i = 0; i < state.guitar.fretsPerLine * state.guitar.strings; i++) diatonicScale[i] = 0;
+	for (i = 0; i < state.guitar.fretsPerLine * state.guitar.strings; i++) state.diatonicScale[i] = 0;
 
 	// Next, find the offset
 	for (i = 0; i < state.alternate; i++) offset += scales[state.activeScale][i + state.activeMode]; // Get the church mode in
@@ -185,26 +180,24 @@ const calculateAlternateScale = limit => {
 		for (j = 0; j < 8; j++) {
 			state.guitar.relations[index + offset + (j * 12)] = seventhRelations[state.inversion][i-1];
 			if(index - chords[state.alternateIndex][state.inversion] === 0)
-				diatonicScale[index + offset + (j * 12)] = 4; // force the root-note in there
+				state.diatonicScale[index + offset + (j * 12)] = 4; // force the root-note in there
 			else
-				diatonicScale[index + offset + (j * 12)] = 3;
+				state.diatonicScale[index + offset + (j * 12)] = 3;
 		}
 		index = chords[state.alternateIndex][i]; // Get the church mode in there
 		i++;
 	} while(i <= 4 - limit);
 
 	state.alternateFlag = true; // Only do this when all the calculations have been executed
-
-	drawInstrument();
 };
 
 const calculateSusScale = () => {
 	let i, j, k, index;
 	let offset = 0;
 
-	if (activeSusChords[state.diatonic] === 1) { // Only do this if the sus chord is actually in there
+	if (state.activeSusChords[state.diatonic] === 1) { // Only do this if the sus chord is actually in there
 		// First, reset the scale
-		for(i = 0; i < state.guitar.fretsPerLine * state.guitar.strings; i++) diatonicScale[i] = 0;
+		for(i = 0; i < state.guitar.fretsPerLine * state.guitar.strings; i++) state.diatonicScale[i] = 0;
 
 		// Next, find the offset
 		for(i = 0; i < state.diatonic; i++) offset += scales[state.activeScale][i + state.activeMode]; // Get the church mode in
@@ -216,17 +209,15 @@ const calculateSusScale = () => {
 			for (j = 0; j < 8; j++) {
 				state.guitar.relations[index + offset + (j * 12)] = susRelations[state.inversion][i-1];
 				if(index - susChord[state.inversion] === 0)
-					diatonicScale[index + offset + (j * 12)] = 2; // force the root-note in there
+					state.diatonicScale[index + offset + (j * 12)] = 2; // force the root-note in there
 				else
-					diatonicScale[index + offset + (j * 12)] = 1;
+					state.diatonicScale[index + offset + (j * 12)] = 1;
 			}
 			index = susChord[i]; // Get the church mode in there
 			i++;
 		} while(i <= 3);
 
 		state.susFlag = true; // Only do this when all the calculations have been executed, otherwise the whole thing might crash.
-
-		drawInstrument();
 	}
 	else { // Otherwise, block the display
 		state.susFlag = false;

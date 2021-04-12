@@ -1,13 +1,6 @@
 import { chords } from './consts.js';
 import state from './state.js';
 
-/* Arrays */
-
-const activeKey = new Array();
-const altChords = new Array();
-const activeSusChords = new Array();
-const diatonicScale = new Array();
-
 /* Classes */
 
 class GuitarType {
@@ -106,8 +99,8 @@ const initiateGuitar = () => {
 
 const initiateVariables = () => {
 	for (let i = 0; i < chords.length; i++) {
-		altChords[i] = new Array();
-		for (let j = 0; j < chords.length; j++) altChords[i][j] = 0;
+		state.altChords[i] = new Array();
+		for (let j = 0; j < chords.length; j++) state.altChords[i][j] = 0;
 	}
 }
 
@@ -116,8 +109,4 @@ export {
 	initiateChordSettings,
 	initiateGuitar,
 	initiateImages,
-	activeKey,
-	activeSusChords,
-	altChords,
-	diatonicScale,
 };
