@@ -61,7 +61,7 @@ const setEventHandlers = () => {
 
   	for (let i = 0; i < 8; i++) {
   		while (state.guitar.scale[index] === 0) index++; // Scan the scale for each consecutive note
-  		scheduleSound(index + state.guitar.note, i, 1, 1000); // Put it in the sequence, with the note offset added
+  		scheduleSound(index + state.guitar.note, i, 1, 1); // Put it in the sequence, with the note offset added
   		index++;
   	}
   });
