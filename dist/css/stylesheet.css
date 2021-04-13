@@ -1,15 +1,6 @@
 @charset "utf-8";
 
-h1,h2,h3,h4,h5,h6{font-family: 'Droid Serif', serif;}
-
-h3, select{margin:10px 0 0 0;}
-
-body{
-	margin:0;
-	padding:0;
-	background:black;
-	font-family: 'Arial', sans-serif;
-}
+.custom-body { background-color: black; }
 
 #header{
 	background:white;
@@ -23,7 +14,7 @@ body{
 	float:left;
 }
 
-#voet{
+#footer{
 	background:black;
 	color:white;
 	width:100%;
@@ -31,19 +22,11 @@ body{
 	font-size:12px;
 }
 
-.container{
-	width:960px;
-	margin-left:auto;
-	margin-right:auto;
-}
+#altHeader, #susHeader { display:none; } /* This is changed dynamically but initially it should be set to hidden. */
 
 #canvas{
 	width: 800px;
 	height: 192px;
-	float:left;
-}
-
-#chordTable{
 	float:left;
 }
 
@@ -52,101 +35,46 @@ body{
 	text-align:left;
 }
 
-#note, #mode, #playScale, #chordStyle, #displayDots, #displayRings{
-	width:100%;
+.custom-table-body {
+	background: white;
 }
 
-table{
-	border-collapse:collapse;
-	margin:5px;
-	float:left;
-	background:white;
-}
-
-table, tr, th{
+.custom-table,
+.custom-row,
+.custom-header-col {
 	background:rgba(0,0,0,0);
+	border-top-color: rgba(0,0,0,0) !important;
 }
 
-.roman, .triadChord, .diatonicChord, .susChord{
-	border-width:1px;
-	border-color:black;
-	border-style:solid;
-	padding:5px;
-	background:white;
-	padding-left:24px;
+.triadChord, .activeSusChord, .diatonicChord, .altChord {
+	background-image: url(../images/play.png);
+	background-repeat: no-repeat;
+	cursor: pointer;
+	padding-left: 24px !important;
 }
 
-.triadChord, .activeSusChord, .diatonicChord{
-	background-image:url(../images/play.png);
+.triadChord, .activeSusChord, .diatonicChord {
+	background-position: 0 8px;
+}
+
+.altChord {
+	background-position: 0 4px;
+}
+
+.susChord{ display:none; } /* This is changed dynamically but initially it should be set to hidden. */
+#chordTable{ display:none; } /* Hide these until everything is loaded */
+
+.triadChord:hover, .activeSusChord:hover, .diatonicChord:hover, .altChord:hover {
+	background: #8888ff;
+	background-image: url(../images/play.png);
 	background-repeat:no-repeat;
-	background-position:left;
-	z-index:2;
-	cursor:pointer;
+	background-position: 0 8px;
 }
 
-.susChord{display:none;} /* This is changed dynamically but initially it should be set to hidden. */
-#tableControls{display:none;} /* Hide these until everything is loaded */
-
-.enharmonicChord{
-	border-width:1px;
-	border-color:black;
-	border-style:solid;
-	background:white;
-	padding:0;
-	margin:0;
-	width:100%;
-	display: none; /* This is changed dynamically but initially it should be set to hidden. */
+.altChord:hover {
+	background-position: 0 4px;
 }
 
-#altHeader, #susHeader{display:none;} /* This is changed dynamically but initially it should be set to hidden. */
+.enharmonicChord{	display: none; } /* This is changed dynamically but initially it should be set to hidden. */
 
-.altChord{
-	background-image:url(../images/play.png);
-	background-repeat:no-repeat;
-	background-position:left;
-	z-index:2;
-	padding:5px;
-	padding-left:24px;
-	border:0;
-	cursor:pointer;
-}	
-
-.triadChord:hover, .activeSusChord:hover, .diatonicChord:hover, .altChord:hover{
-	background:#8888ff;
-	background-image:url(../images/play.png);
-	background-repeat:no-repeat;
-	background-position:left;
-}
-
-.roman{width:40px;}
-.susChord{width:120px;}
-.triadChord{width:150px;}
-.diatonicChord{width:200px;}
-.enharmonicChord{width:233px;}
-
-.option{
-	float:left;
-	padding:0;
-	margin-right:30px;
-	padding-bottom:20px;
-	display:none;
-}
-
-#restrictWidth{ /* Safari made this one too big */
-	width:129px;
-}
-
-.optionsGroup{
-	clear:both;
-	display:block;
-}
-
-#scale{
-	font-weight:bold;
-	padding:5px 0 5px 0;
-}
-
-
-#scaleDisplay{
-	width:212px !important;
-}
+.option { display: none; } /* Hide initially */

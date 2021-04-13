@@ -328,7 +328,7 @@ const draw = () => {
 const exposeUserInterface = () => {
 	changeScale();
 	$(".option").show();
-	$("#tableControls").show();
+	$("#chordTable").show();
 	$("#note").focus();
 	draw();
 };

@@ -3,17 +3,18 @@
 <html>
 <head>
 <meta charset="utf-8" />
-<title>A JavaScript Portfolio</title>
+<title>Scale calculator</title>
 
-<link href='http://fonts.googleapis.com/css?family=Droid+Serif' rel='stylesheet' type='text/css'>
+<!-- <link href='http://fonts.googleapis.com/css?family=Droid+Serif' rel='stylesheet' type='text/css'> -->
 <link href="css/stylesheet.css" rel="stylesheet" media="all" />
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
 
 <!-- Fetch jQuery and the Migrate plugin -->
 <script src="http://code.jquery.com/jquery-1.9.0.js"></script>
 
 </head>
 
-<body>
+<body class="custom-body">
 
     <div id="header">
         <div class="container">
@@ -23,10 +24,9 @@
 
    	<div id="content">
         <div class="container">
-           <div class="optionsGroup">
-
+           <div class="optionsGroup d-flex justify-content-between my-1">
                <div class="option">
-                    <h3>Select note</h3>
+                    <h5>Select note</h5>
                     <select id="note">
                         <option value="0" name="Fb">Fb</option>
                         <option value="5" name="Cb">Cb</option>
@@ -53,7 +53,7 @@
                 </div>
 
                 <div class="option">
-                    <h3>Select key</h3>
+                    <h5>Select key</h5>
                     <select id="key">
                         <option value="0" selected="selected">Major</option>
                         <option value="1">Natural minor</option>
@@ -70,7 +70,7 @@
                 </div>
 
                 <div class="option">
-                    <h3>Select mode</h3>
+                    <h5>Select mode</h5>
                     <select id="mode">
                         <option value="0" selected="selected">Ionian</option>
                         <option value="1">Dorian</option>
@@ -83,93 +83,97 @@
                 </div>
 
                 <div class="option" id="scaleDisplay">
-                    <h3>Scale</h3>
+                    <h5>Scale</h5>
                     <div id="scale"></div>
                 </div>
 
               	<div class="option">
-                    <h3>Play scale</h3>
-                    <button id="playScale">Play</button>
+                    <h5>Play scale</h5>
+                    <button class="btn btn-primary" type="button" id="playScale">Play</button>
                 </div>
 
-			</div>
-
-            <div class="optionsGroup">
+           </div>
+           <div class="d-flex mb-1">
+             <div class="optionsGroup">
                 <div class="option" id="restrictWidth">
-                    <input type="radio" name="displayToggle" value="0" checked />Fretboard<br>
-                    <input type="radio" name="displayToggle" value="1" />Piano
+                  <div class="d-flex flex-column">
+                    <label><input type="radio" name="displayToggle" value="0" checked />Fretboard</label>
+                    <label><input type="radio" name="displayToggle" value="1" />Piano</label>
+                  </div>
+                  <h5>Note options</h5>
+                  <select id="displayDots">
+                  	<option value="0" selected="selected">Dots only</option>
+                      <option value="1">Dots and notes</option>
+                      <option value="2">Dots and roman</option>
+                 	</select>
 
-                    <h3>Note options</h3>
-                    <select id="displayDots">
-                    	<option value="0" selected="selected">Dots only</option>
-                        <option value="1">Dots and notes</option>
-                        <option value="2">Dots and roman</option>
-                   	</select>
-
-                    <h3>Chord options</h3>
-                    <select id="displayRings">
-                    	<option value="0" selected="selected">Rings only</option>
-                        <option value="1">Rings & relations</option>
-                   	</select>
+                  <h5>Chord options</h5>
+                  <select id="displayRings">
+                  	<option value="0" selected="selected">Rings only</option>
+                      <option value="1">Rings & relations</option>
+                 	</select>
 
                 </div>
 
-	        	<canvas id="canvas">Not supported</canvas>
-          	</div>
-
-            <div class="optionsGroup" id="tableControls">
                 <div class="option">
-                    <h3>Chord playback</h3>
+                    <h5>Chord playback</h5>
                     <select id="chordStyle">
                         <option value="0">Full chords</option>
                         <option value="1" selected="selected">Fast arpeggio</option>
                         <option value="2">Slow arpeggio</option>
                     </select>
 
-                    <h3>Options</h3>
-                    <input type="checkbox" name="thirdChordsActive" checked /> Third chords<br />
-                    <input type="checkbox" name="susChordsActive" /> Sus4 chord<br />
-                    <input type="checkbox" name="seventhChordsActive" checked /> Seventh chords<br />
-                    <input type="checkbox" name="alternateChordsActive" />Alternate chords<br />
+                    <h5>Options</h5>
+                    <div class="d-flex flex-column">
+                      <label><input type="checkbox" name="thirdChordsActive" checked /> Third chords</label>
+                      <label><input type="checkbox" name="susChordsActive" /> Sus4 chord</label>
+                      <label><input type="checkbox" name="seventhChordsActive" checked /> Seventh chords</label>
+                      <label><input type="checkbox" name="alternateChordsActive" /> Alternate chords</label>
+                    </div>
                 </div>
+              </div>
+              <div class="d-flex flex-column ml-4">
+
+                <canvas id="canvas" class="mb-1">Not supported</canvas>
 
                 <div id="chordTable">
-
-                    <table>
-                        <tbody>
-                            <tr>
-                                <th></th>
-                                <th id="triadHeader">
+                    <table class="table table-sm custom-table">
+                        <thead>
+                            <tr class="custom-row">
+                                <th class="custom-header-col"></th>
+                                <th class="custom-header-col" id="triadHeader">
                                     <div id="triadInversions">
-                                        <input type="radio" name="triadInversions" value="0" checked />5-3
-                                        <input type="radio" name="triadInversions" value="1" />6-3
-                                        <input type="radio" name="triadInversions" value="2" />6-4
+                                        <label><input type="radio" name="triadInversions" value="0" checked /> 5-3</label>
+                                        <label><input type="radio" name="triadInversions" value="1" /> 6-3</label>
+                                        <label><input type="radio" name="triadInversions" value="2" /> 6-4</label>
                                     </div>
                                 </th>
-                                <th id="susHeader">
+                                <th class="custom-header-col" id="susHeader">
                                     <div id="susInversions">
-                                        <input type="radio" name="susInversions" value="0" checked />5-4
-                                        <input type="radio" name="susInversions" value="1" />5-2
-                                        <input type="radio" name="susInversions" value="2" />7-4
+                                        <label><input type="radio" name="susInversions" value="0" checked /> 5-4</label>
+                                        <label><input type="radio" name="susInversions" value="1" /> 5-2</label>
+                                        <label><input type="radio" name="susInversions" value="2" /> 7-4</label>
                                     </div>
                                 </th>
-                                <th id="seventhHeader">
+                                <th class="custom-header-col" id="seventhHeader">
                                     <div id="seventhInversions">
-                                        <input type="radio" name="seventhInversions" value="0" checked />7-5-3
-                                        <input type="radio" name="seventhInversions" value="1" />6-5-3
-                                        <input type="radio" name="seventhInversions" value="2" />6-4-3
-                                        <input type="radio" name="seventhInversions" value="3" />6-4-2
+                                        <label><input type="radio" name="seventhInversions" value="0" checked /> 7-5-3</label>
+                                        <label><input type="radio" name="seventhInversions" value="1" /> 6-5-3</label>
+                                        <label><input type="radio" name="seventhInversions" value="2" /> 6-4-3</label>
+                                        <label><input type="radio" name="seventhInversions" value="3" /> 6-4-2</label>
                                     </div>
                                 </th>
-                                <th id="altHeader">
+                                <th class="custom-header-col" id="altHeader">
                                     <div id="altInversions">
-                                        <input type="radio" name="altInversions" value="0" checked />7-5-3
-                                        <input type="radio" name="altInversions" value="1" />6-5-3
-                                        <input type="radio" name="altInversions" value="2" />6-4-3
-                                        <input type="radio" name="altInversions" value="3" />6-4-2
+                                        <label><input type="radio" name="altInversions" value="0" checked /> 7-5-3</label>
+                                        <label><input type="radio" name="altInversions" value="1" /> 6-5-3</label>
+                                        <label><input type="radio" name="altInversions" value="2" /> 6-4-3</label>
+                                        <label><input type="radio" name="altInversions" value="3" /> 6-4-2</label>
                                     </div>
                                 </th>
                             </tr>
+                          </thead>
+                          <tbody class="custom-table-body">
                             <tr>
                                 <td class="roman"></td>
                                 <td class="triadChord"></td>
@@ -222,15 +226,15 @@
                         </tbody>
                     </table>
                 </div>
-        	</div>
-		</div>
+      	     </div>
+	         </div>
 	</div>
 
-    <div id="voet">
+    <div id="footer">
         <div class="container">
         	<p>&copy; Lucas van Heerikhuizen, 2021</p>
         </div>
-	</div>
+    </div>
 
 	<script src="bundle.js"></script>
 </body>
