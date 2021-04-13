@@ -26,5 +26,8 @@
     "webpack": "^5.30.0",
     "webpack-cli": "^3.3.4",
     "webpack-dev-server": "^3.7.1"
+  },
+  "dependencies": {
+    "tone": "^14.7.77"
   }
 }

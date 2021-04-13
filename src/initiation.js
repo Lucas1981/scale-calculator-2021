@@ -75,7 +75,7 @@ const initiateImages = () => {
 const initiateChordSettings = () => {
 	state.chordSettings = new ChordSettingsType();
 	state.chordSettings.volume = .25;
-	state.chordSettings.speed = 150;
+	state.chordSettings.speed = .25;
 };
 
 const initiateGuitar = () => {

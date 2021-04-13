@@ -1,6 +1,5 @@
 import { initiateVariables,	initiateChordSettings, initiateGuitar,	initiateImages } from './initiation.js';
 import { renderLoadingScreen, exposeUserInterface, initiateEventHandlers } from './ui-layer.js';
-import { initiateSounds } from './sound.js';
 
 /* Event handlers */
 
@@ -19,7 +18,6 @@ $(document).ready(() => {
   initiateChordSettings();
 	initiateGuitar();
 	promises.push(...initiateImages());
-  promises.push(...initiateSounds());
 
   Promise.all(promises).then(() => {
     clearInterval(interval);

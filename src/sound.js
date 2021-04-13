@@ -1,47 +1,30 @@
 let audioQueue;
 const audioChannels = [];
 const mySound = [];
+import * as Tone from 'tone';
 
-const initiateSounds = () => {
-	const promises = [];
+const noteMap = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+const instrument = new Tone.Sampler({
+	urls: {
+		"C4": "C4.mp3",
+		"D#4": "Ds4.mp3",
+		"F#4": "Fs4.mp3",
+		"A4": "A4.mp3",
+	},
+	release: 1,
+	baseUrl: "https://tonejs.github.io/audio/salamander/",
+}).toDestination();
 
-	for (let i = 0; i < 48; i++) {
-		mySound[i] = new Audio();
-		if ("" !== mySound[i].canPlayType("audio/mp3")) {
-			mySound[i].src = "audio/" + i.toString() + ".mp3"; // IE only supports mp3
-		} else {
-			mySound[i].src = "audio/" + i.toString() + ".wav";
-		}
-
-		mySound[i].preload = 'auto';
-		mySound[i].load();
-		promises.push(new Promise(resolve => {
-			mySound[i].addEventListener("loadeddata", resolve);
-		}));
-	}
-
-	for (let i = 0; i < 32; i++) audioChannels[i] = new Audio();
-	audioQueue = 0;
-
-	return promises;
-}
+// new Tone.PolySynth(Tone.Synth).toDestination();
 
 const scheduleSound = (index, timeStretch, volume, speed) => {
-	setTimeout(() => {
-		/*var track = mySound[index].cloneNode();
-		track.volume = volume;
-		track.play();*/
-		audioChannels[audioQueue].src = mySound[index].src
-		audioChannels[audioQueue].load();
-		audioChannels[audioQueue].volume = volume;
-		audioChannels[audioQueue].play();
-
-		if(audioQueue === 31) audioQueue = 0;
-		else audioQueue++;
-	}, speed * timeStretch);
-}
+	const note = `${noteMap[(4 + index) % 12]}${3 + parseInt((4 + index) / 12)}`;
+	const now = Tone.now();
+	const delay = timeStretch * speed;
+	instrument.triggerAttack(note, now + delay);
+	instrument.triggerRelease(note, now + delay + 1);
+};
 
 export {
-	initiateSounds,
 	scheduleSound,
 }

@@ -32,10 +32,10 @@ const initiateEventHandlers = () => {
 			state.chordSettings.speed = 0;
 			state.chordSettings.volume = .25;
 		} else if (chordStyle.value === "1") {
-			state.chordSettings.speed = 150;
+			state.chordSettings.speed = .25;
 			state.chordSettings.volume = .25;
 		} else {
-			state.chordSettings.speed = 1000;
+			state.chordSettings.speed = .5;
 			state.chordSettings.volume = 1;
 		}
 	};
