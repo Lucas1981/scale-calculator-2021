@@ -70,13 +70,13 @@ const initiateImages = () => {
 	}));
 
 	return promises;
-}
+};
 
 const initiateChordSettings = () => {
 	state.chordSettings = new ChordSettingsType();
 	state.chordSettings.volume = .25;
 	state.chordSettings.speed = 150;
-}
+};
 
 const initiateGuitar = () => {
 	state.guitar = new GuitarType();
@@ -95,14 +95,14 @@ const initiateGuitar = () => {
 
 	state.guitar.tuning = [0, 7, 3, 10, 5, 0]; 	// E A D G B E = [0, 7, 3, 10, 5, 0]
 	// guitar.tuning = [8, 0, 5, 10, 3, 8];	// C G D A E C = [8, 0, 5, 10, 3, 8]
-}
+};
 
 const initiateVariables = () => {
 	for (let i = 0; i < chords.length; i++) {
 		state.altChords[i] = new Array();
 		for (let j = 0; j < chords.length; j++) state.altChords[i][j] = 0;
 	}
-}
+};
 
 export {
 	initiateVariables,

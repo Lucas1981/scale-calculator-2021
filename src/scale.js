@@ -23,13 +23,13 @@ const getNoteNames = () => {
 
 		if (keyIncrease - sharpCorrection + flatCorrection > scaleIncrease) {
 			for(let k = 0; k < ((keyIncrease - sharpCorrection + flatCorrection) - scaleIncrease); k++) {
-				state.activeKey[j+1] += "b";
+				state.activeKey[j + 1] += "b";
 			}
 		}
 
 		if (keyIncrease - sharpCorrection + flatCorrection < scaleIncrease) {
 			for (let k = 0; k < (scaleIncrease - (keyIncrease - sharpCorrection + flatCorrection)); k++) {
-				state.activeKey[j+1] += "#";
+				state.activeKey[j + 1] += "#";
 			}
 		}
 	}
@@ -94,7 +94,7 @@ const findSusChords = () => {
 			else k++;
 		}
 		if (foundChordFlag === true) state.activeSusChords[i] = 1; // If the flag is still up, the chord is there
-		index += scales[state.activeScale][i];
+		index += scales[state.activeScale][i + state.activeMode];
 	}
 };
 
@@ -113,7 +113,7 @@ const indexAlternateChords = () => {
 				state.altChords[i][j] = 1; // If the flag is still up, the chord is there
 			}
 		}
-		index += scales[state.activeScale][i];
+		index += scales[state.activeScale][i + state.activeMode];
 	}
 };
 
